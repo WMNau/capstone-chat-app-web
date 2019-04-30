@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import { withAuthorization } from "../Session";
+
 import { Form } from "react-bootstrap";
 import "./chat.scss";
 
@@ -92,4 +94,6 @@ class Chat extends Component {
   }
 }
 
-export default Chat;
+const condition = authUser => !!authUser;
+
+export default withAuthorization(condition)(Chat);
