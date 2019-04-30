@@ -1,0 +1,32 @@
+@import '../../colors';
+
+.login {
+  text-align: center;
+  margin: auto;
+
+  .jumbotron {
+    background-color: $colorPrimaryDark;
+
+    .form-text {
+      text-align: left;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .login {
+    form {
+      margin: auto;
+      width: 40%;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  .login {
+    form {
+      margin: auto;
+      width: 50%;
+    }
+  }
+}

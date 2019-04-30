@@ -1,0 +1,60 @@
+@import '../../colors';
+
+.chat {
+  display: flex;
+  flex-direction: row;
+  height: 90vh;
+
+  .room {
+    width: 25%;
+    margin-right: 2px;
+    padding: 20px;
+    border-radius: 3px;
+    box-shadow: 6px 3px 8px $colorPrimary;
+
+    .room-item {
+      padding: 16px;
+      padding-bottom: 0;
+      border-bottom: 1px solid $colorTextDark;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .room-item:hover {
+      background-color: $colorPrimary;
+      border-bottom: 1px solid $colorText;
+    }
+
+    #input {
+      display: none;
+    }
+
+    form {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      right: calc(75% + 4px);
+    }
+
+    #toggle-button {
+      position: absolute;
+      bottom: 16px;
+      right: calc(75% + 4px);
+      color: $colorText;
+    }
+  }
+
+  .message {
+    width: 74%;
+    padding: 20px;
+    border-radius: 3px;
+    box-shadow: 1px 2px 6px $colorPrimary;
+
+    form {
+      position: absolute;
+      bottom: 2px;
+      left: calc(25% + 8px);
+      right: 18px;
+    }
+  }
+}

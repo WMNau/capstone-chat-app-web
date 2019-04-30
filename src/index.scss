@@ -1,0 +1,10 @@
+@import 'colors';
+
+body {
+  background-color: $colorPrimaryDark;
+  color: $colorText;
+}
+
+.bg-dark {
+  background-color: $colorPrimary !important;
+}
