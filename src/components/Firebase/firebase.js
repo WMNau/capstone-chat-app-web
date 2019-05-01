@@ -19,6 +19,7 @@ class Firebase {
   constructor() {
     app.initializeApp(config);
 
+    this.app = app;
     this.auth = app.auth();
     this.db = app.database();
     this.storage = app.storage();
@@ -38,9 +39,13 @@ class Firebase {
     return this.auth.sendPasswordResetEmail(email);
   };
 
+  uid = () => this.auth.currentUser.uid;
+
   user = uid => this.db.ref(`users/${uid}`);
 
   users = () => this.db.ref("users");
+
+  updateUser = (uid, updatedUser) => this.user(uid).update(updatedUser);
 
   deleteUser = () => this.auth.currentUser.delete();
 

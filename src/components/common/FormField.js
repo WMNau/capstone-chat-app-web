@@ -6,6 +6,7 @@ import { Form, InputGroup } from "react-bootstrap";
 const FormField = ({
   name,
   type,
+  as,
   placeholder,
   value,
   info,
@@ -24,6 +25,7 @@ const FormField = ({
           <Form.Control
             name={name}
             type={type}
+            as={as}
             placeholder={placeholder}
             value={value}
             onChange={onChange}
@@ -62,6 +64,7 @@ const FormField = ({
 FormField.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
+  as: PropTypes.string,
   placeholder: PropTypes.string,
   value: PropTypes.string.isRequired,
   info: PropTypes.string,

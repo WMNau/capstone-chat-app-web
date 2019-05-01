@@ -1,0 +1,25 @@
+@import '../../colors';
+
+.users {
+
+  .card {
+    background-color: $colorPrimaryDark;
+    box-shadow: 1px 2px 8px $colorPrimary;
+    cursor: pointer;
+  }
+
+  .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    li {
+      list-style: none;
+    }
+
+    img {
+      width: 75px;
+      height: 75px;
+    }
+  }
+}

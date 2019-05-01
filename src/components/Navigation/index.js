@@ -10,7 +10,7 @@ import Authorized from "./Authorized.navigation";
 
 const getNavigationLinks = () => (
   <AuthUserContext.Consumer>
-    {authUser => (authUser ? <Authorized /> : <SignIn />)}
+    {authUser => (authUser ? <Authorized authUser={authUser} /> : <SignIn />)}
   </AuthUserContext.Consumer>
 );
 
