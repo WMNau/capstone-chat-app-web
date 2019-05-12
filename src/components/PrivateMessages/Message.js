@@ -7,22 +7,31 @@ import { Row, Col, ListGroup, Image } from "react-bootstrap";
 import defaultProfile from "../common/default_profile.png";
 
 const Message = ({ message, fromUser, toUser, uid }) => {
-  const direction = toUser.uid === uid ? "to" : "from";
-  const profileImage =
-    fromUser.profileImage === "" ? defaultProfile : fromUser.profileImage;
+  const direction = message.fromUid === uid ? "from" : "";
+  console.log("Text:", message.text);
+  console.log("Direction:", direction);
+  let profileImage = defaultProfile;
+  if (direction === "from")
+    profileImage =
+      fromUser.profileImage === "" ? defaultProfile : fromUser.profileImage;
+  else
+    profileImage =
+      toUser.profileImage === "" ? defaultProfile : toUser.profileImage;
   return (
-    <ListGroup.Item className={direction}>
-      <Row>
-        <Col sm={2} className="meta">
-          <Image src={profileImage} roundedCircle />
-          <p>
-            <small>{moment(message.timestamp).format("LLL")}</small>
-          </p>
-        </Col>
-        <Col className="text">
-          <p>{message.text}</p>
-        </Col>
-      </Row>
+    <ListGroup.Item>
+      <div className={direction}>
+        <Row>
+          <Col sm={2} className="meta">
+            <Image src={profileImage} roundedCircle />
+            <p>
+              <small>{moment(message.timestamp).format("LLL")}</small>
+            </p>
+          </Col>
+          <Col className="text">
+            <p>{message.text}</p>
+          </Col>
+        </Row>
+      </div>
     </ListGroup.Item>
   );
 };

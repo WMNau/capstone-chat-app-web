@@ -6,7 +6,7 @@ export const addRoom = room => {
     firebase
       .database()
       .ref(`rooms/${room.toLowerCase()}`)
-      .set({ name: room })
+      .set({ name: room, uid: firebase.auth().currentUser.uid })
       .then(() => dispatch({ type: ADD_ROOM }))
       .catch(err => dispatch({ type: ERROR_ADD_ROOM, payload: err }));
   };

@@ -45,28 +45,10 @@
     background-color: $colorPrimary;
     margin-bottom: 3px;
   }
+}
 
-  .to {
-    .meta {
-      float: left;
-      margin-right: 16px;
-    }
-
-    .text {
-      float: left;
-    }
-  }
-
-  .from {
-    .meta {
-      float: right;
-      margin-left: 16px;
-    }
-
-    .text {
-      float: right;
-    }
-  }
+.from {
+  margin-left: 10%;
 }
 
 #form-input {
