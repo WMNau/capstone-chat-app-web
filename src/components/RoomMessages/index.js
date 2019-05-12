@@ -18,6 +18,7 @@ import { addChat } from "../../store/actions/chats.action";
 const INITIAL_STATE = {
   text: "",
   messages: [],
+  roomId: "",
   errors: {},
 };
 
@@ -25,9 +26,7 @@ class RoomMessages extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      ...INITIAL_STATE,
-    };
+    this.state = { ...INITIAL_STATE };
   }
 
   static propTypes = {
@@ -37,13 +36,22 @@ class RoomMessages extends Component {
   };
 
   componentDidMount = () => {
-    const { chats } = this.props;
+    const { chats, match } = this.props;
+    const { id } = match.params;
+    if (id) this.setState({ roomId: id });
     if (chats) this.setMessages(chats);
   };
 
   componentWillReceiveProps = nextProps => {
-    const { chats } = nextProps;
+    const { chats, match } = nextProps;
+    const { id } = match.params;
+    if (id && this.state.roomId !== "" && this.state.roomId !== id)
+      this.setState({ messages: [], roomId: id });
     if (chats) this.setMessages(chats);
+  };
+
+  componentWillUnmount = () => {
+    this.setState({ ...INITIAL_STATE });
   };
 
   setMessages = chats => {
