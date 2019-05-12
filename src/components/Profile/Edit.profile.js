@@ -1,16 +1,19 @@
 import React, { Component } from "react";
-import uuid from "uuid/v4";
-
-import { withFirebase } from "../Firebase";
+import { withRouter } from "react-router-dom";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firebaseConnect } from "react-redux-firebase";
+import PropTypes from "prop-types";
 
 import defaultProfile from "../common/default_profile.png";
-import isEmpty from "../../utils/isEmpty";
 
-import { Container, Form, Image, Button } from "react-bootstrap";
+import { Container, Form, Image, ButtonGroup, Button } from "react-bootstrap";
 import "./profile.scss";
 
 import FormField from "../common/FormField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { updateProfile } from "../../store/actions/user.action";
 
 const INITIAL_STATE = {
   avatar: "",
@@ -18,8 +21,6 @@ const INITIAL_STATE = {
   firstName: "",
   lastName: "",
   bio: "",
-  user: {},
-  loading: false,
   errors: {},
 };
 
@@ -27,33 +28,32 @@ class EditProfile extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      ...INITIAL_STATE,
-    };
+    this.state = { ...INITIAL_STATE };
   }
 
-  componentDidMount = () => {
-    this.setState({ loading: true });
-    const { id } = this.props.match.params;
-    const { firebase } = this.props;
-    firebase.user().off();
-    firebase.user(id).on("value", snapshot => {
-      const user = snapshot.val();
-      this.setState({
-        profileImage:
-          user.profileImage === "" ? defaultProfile : user.profileImage,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        bio: user.bio,
-        user,
-        loading: false,
-        isCurrentUser: id === user.uid,
-      });
-    });
+  static propTypes = {
+    auth: PropTypes.object.isRequired,
+    user: PropTypes.object,
+    updateProfile: PropTypes.func.isRequired,
   };
 
-  componentWillUnmount = () => {
-    this.props.firebase.user().off();
+  componentDidMount = () => {
+    if (this.props.user) this.populate(this.props.user);
+  };
+
+  componentWillReceiveProps = nextProps => {
+    if (nextProps.user) this.populate(nextProps.user);
+  };
+
+  populate = user => {
+    const profileImage =
+      user.profileImage === "" ? defaultProfile : user.profileImage;
+    this.setState({
+      profileImage,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      bio: user.bio,
+    });
   };
 
   getAvatar = e => {
@@ -78,121 +78,119 @@ class EditProfile extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    const { avatar } = this.state;
-    const { firebase } = this.props;
-    if (avatar === null || avatar === undefined || avatar === "")
-      this.updateUser(null);
-    else {
-      firebase
-        .storageRef(uuid())
-        .put(avatar)
-        .then(snapshot => snapshot.ref.getDownloadURL())
-        .then(url => this.updateUser(url))
-        .catch(err =>
-          console.log(`[ ${err.name} ][ ${err.code} ]\n${err.message}`)
-        );
-    }
-  };
-
-  updateUser = url => {
-    console.log(url);
-    const { firebase } = this.props;
-    const { user, firstName, lastName, bio } = this.state;
-    const updatedUser = {};
-    updatedUser.profileImage = isEmpty(url) ? null : url;
-    updatedUser.firstName =
-      user.firstName !== firstName && !isEmpty(firstName) ? null : firstName;
-    updatedUser.lastName =
-      user.lastName !== lastName && !isEmpty(lastName) ? null : lastName;
-    if (!isEmpty(updatedUser.firstName) || !isEmpty(updatedUser.lastName)) {
-      if (!isEmpty(updatedUser.firstName) && !isEmpty(updatedUser.lastName)) {
-        updatedUser.fullName = `${firstName} ${lastName}`;
-      } else if (!isEmpty(updatedUser.firstName)) {
-        updatedUser.fullName = `${firstName} ${user.lastName}`;
-      } else {
-        updatedUser.fullName = `${user.firstName} ${lastName}`;
-      }
-    }
-    if (user.bio !== bio) updatedUser.bio = isEmpty(bio) ? "" : bio;
-    if (updatedUser !== {}) updatedUser.updatedAt = Date.now();
-    firebase
-      .updateUser(user.uid, updatedUser)
-      .then(() => {
-        this.setState({ ...INITIAL_STATE });
-        this.props.history.goBack();
-      })
-      .catch(err => console.log(err));
+    const { avatar, firstName, lastName, bio } = this.state;
+    const { user } = this.props;
+    const profile = {
+      profileImage: avatar,
+      firstName: firstName === "" ? user.firstName : firstName,
+      lastName: lastName === "" ? user.lastName : lastName,
+      bio,
+    };
+    this.props.updateProfile(user, profile);
+    this.props.history.goBack();
   };
 
   render() {
-    const {
-      profileImage,
-      firstName,
-      lastName,
-      bio,
-      loading,
-      errors,
-    } = this.state;
+    const { profileImage, firstName, lastName, bio, errors } = this.state;
     return (
       <Container>
+        <h1 className="my-4">Edit profile</h1>
         <div className="profile">
-          {loading && <div>Loading...</div>}
-          <h1 className="my-4">Edit profile</h1>
-          <Form onSubmit={this.onSubmit}>
-            <div className="avatar my-4">
-              <input
-                type="file"
-                onChange={this.getAvatar}
-                style={{ display: "none" }}
-                ref={fileInput => (this.fileInput = fileInput)}
+          {this.props.user ? (
+            <Form onSubmit={this.onSubmit}>
+              <div className="avatar my-4">
+                <input
+                  type="file"
+                  onChange={this.getAvatar}
+                  style={{ display: "none" }}
+                  ref={fileInput => (this.fileInput = fileInput)}
+                />
+                <Image
+                  className="profile-img mb-4"
+                  src={profileImage}
+                  roundedCircle
+                  onClick={() => this.fileInput.click()}
+                />
+              </div>
+
+              <FormField
+                name="firstName"
+                type="text"
+                placeholder="Enter your first name..."
+                value={firstName}
+                error={errors.firstName}
+                prepend={<FontAwesomeIcon icon="user" />}
+                onChange={this.onTextChanged}
               />
-              <Image
-                className="profile-img mb-4"
-                src={profileImage}
-                roundedCircle
-                onClick={() => this.fileInput.click()}
+
+              <FormField
+                name="lastName"
+                type="text"
+                placeholder="Enter your last name..."
+                value={lastName}
+                error={errors.lastName}
+                prepend={<FontAwesomeIcon icon="user" />}
+                onChange={this.onTextChanged}
               />
-            </div>
 
-            <FormField
-              name="firstName"
-              type="text"
-              placeholder="Enter your first name..."
-              value={firstName}
-              error={errors.firstName}
-              prepend={<FontAwesomeIcon icon="user" />}
-              onChange={this.onTextChanged}
-            />
-
-            <FormField
-              name="lastName"
-              type="text"
-              placeholder="Enter your last name..."
-              value={lastName}
-              error={errors.lastName}
-              prepend={<FontAwesomeIcon icon="user" />}
-              onChange={this.onTextChanged}
-            />
-
-            <FormField
-              name="bio"
-              type="text"
-              as="textarea"
-              placeholder="Share something about yourself with us..."
-              value={bio}
-              error={errors.bio}
-              prepend={<FontAwesomeIcon icon="envelope" />}
-              onChange={this.onTextChanged}
-            />
-
-            <Button variant="primary" size="lg" type="submit" block>
-              Submit
-            </Button>
-          </Form>
+              <FormField
+                name="bio"
+                type="text"
+                as="textarea"
+                placeholder="Share something about yourself with us..."
+                value={bio}
+                error={errors.bio}
+                prepend={<FontAwesomeIcon icon="envelope" />}
+                onChange={this.onTextChanged}
+              />
+              <div className="d-flex flex-column">
+                <ButtonGroup size="lg">
+                  <Button
+                    variant="danger"
+                    onClick={() => this.props.history.goBack()}
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant="primary" type="submit">
+                    Submit
+                  </Button>
+                </ButtonGroup>
+              </div>
+            </Form>
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
       </Container>
     );
   }
 }
 
-export default withFirebase(EditProfile);
+const mapStateToProps = (state, passedParams) => {
+  const { uid } = passedParams.match.params;
+  const { firebase } = state;
+  const { auth, data } = firebase;
+  const { users } = data;
+  let user = null;
+  if (users && auth.uid === uid) user = users[uid];
+  return {
+    auth,
+    user,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateProfile: (user, profile) => dispatch(updateProfile(user, profile)),
+  };
+};
+
+export default withRouter(
+  compose(
+    connect(
+      mapStateToProps,
+      mapDispatchToProps
+    ),
+    firebaseConnect(["users"])
+  )(EditProfile)
+);

@@ -1,28 +1,24 @@
 import React from "react";
-
-import { withFirebase } from "../Firebase";
-
-import * as ROUTES from "../../constants/routes";
-
 import { Nav } from "react-bootstrap";
+import PropTypes from "prop-types";
 
-const Authorized = ({ authUser, firebase }) => (
+import Rooms from "../Rooms";
+
+const Authorized = ({ logout, uid }) => (
   <React.Fragment>
-    <Nav.Link href={`${ROUTES.PROFILE}${authUser.uid}`}>
-      View your profile
-    </Nav.Link>
-    <Nav.Link href={ROUTES.CHAT}>Chat</Nav.Link>
-    <Nav.Link href={ROUTES.PM}>Private message</Nav.Link>
-    <Nav.Link href={ROUTES.PROFILES}>Search users</Nav.Link>
-    <Nav.Link
-      href="/login"
-      onClick={e => {
-        firebase.logout();
-      }}
-    >
+    <Rooms />
+    <Nav.Link href={"/latest_messages"}>Private message</Nav.Link>
+    <Nav.Link href={"/users"}>Search users</Nav.Link>
+    <Nav.Link href={`/user/${uid}`}>View your profile</Nav.Link>
+    <Nav.Link href="/" onClick={logout}>
       Logout
     </Nav.Link>
   </React.Fragment>
 );
 
-export default withFirebase(Authorized);
+Authorized.propTypes = {
+  logout: PropTypes.func.isRequired,
+  uid: PropTypes.string.isRequired,
+};
+
+export default Authorized;

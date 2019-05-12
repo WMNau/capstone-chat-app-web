@@ -11,10 +11,8 @@ const UserList = ({ user, onSelected }) => {
   return (
     <Card className="mt-4" onClick={() => onSelected(user)}>
       <Card.Body>
-        <div className="user">
-          <Image src={profileImage} roundedCircle className="mr-4" />
-          <h4>{user.fullName}</h4>
-        </div>
+        <Image src={profileImage} roundedCircle className="mr-4" />
+        <span>{user.fullName}</span>
       </Card.Body>
     </Card>
   );

@@ -1,95 +1,90 @@
 import React, { Component } from "react";
+import { withRouter, NavLink } from "react-router-dom";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firebaseConnect } from "react-redux-firebase";
+import PropTypes from "prop-types";
 
-import { withFirebase } from "../Firebase";
-
-import * as ROUTES from "../../constants/routes";
 import defaultProfile from "../common/default_profile.png";
 
 import { Image, Button } from "react-bootstrap";
 import "./profile.scss";
-
-const INITIAL_STATE = {
-  profileImage: defaultProfile,
-  user: {},
-  loading: false,
-  isCurrentUser: false,
-};
+import { isEmpty } from "@firebase/util";
 
 class Profile extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      ...INITIAL_STATE,
-    };
-  }
-
-  componentDidMount = () => {
-    this.setState({ loading: true });
-    const { id } = this.props.match.params;
-    const { firebase } = this.props;
-    firebase.user(id).on("value", snapshot => {
-      const user = snapshot.val();
-      this.setState({
-        profileImage:
-          user.profileImage === "" ? defaultProfile : user.profileImage,
-        user,
-        loading: false,
-        isCurrentUser: firebase.uid() === user.uid,
-      });
-    });
-  };
-
-  componentWillUnmount = () => {
-    this.props.firebase.users().off();
+  static propTypes = {
+    auth: PropTypes.object,
+    user: PropTypes.object,
   };
 
   onEditSelected = e => {
-    this.setState({ ...INITIAL_STATE });
-    this.props.history.push(`${ROUTES.EDIT}${this.state.user.uid}`);
+    this.props.history.push(`/user/edit/${this.state.user.uid}`);
   };
 
-  onMessageSelected = e => {
-    console.log("message");
+  displayButton = () => {
+    if (isEmpty(this.props.user)) return null;
+    else if (this.props.auth && this.props.user.uid === this.props.auth.uid)
+      return (
+        <NavLink to={`/user/edit/${this.props.user.uid}`}>
+          <Button variant="info" size="lg" block>
+            Edit
+          </Button>
+        </NavLink>
+      );
+    else
+      return (
+        <NavLink to={`/messages/${this.props.auth.uid}/${this.props.user.uid}`}>
+          <Button variant="info" size="lg" block>
+            Message
+          </Button>
+        </NavLink>
+      );
   };
 
   render() {
-    const { profileImage, user, loading, isCurrentUser } = this.state;
-
+    const { user } = this.props;
+    let profileImage = defaultProfile;
+    if (user && user.profileImage !== "") profileImage = user.profileImage;
     return (
       <div className="profile mt-4">
-        {loading && <div>Loading...</div>}
         <h1 className="text-center">Profile</h1>
-        <div className="profile-info">
-          <Image src={profileImage} roundedCircle className="my-4 mr-4" />
-          <h2>{user.fullName}</h2>
-          <p className="text-muted">Email: {user.email}</p>
-          <p className="text-muted mb-4">
-            Bio: {user.bio === "" ? "None" : user.bio}
-          </p>
-          {isCurrentUser ? (
-            <Button
-              variant="info"
-              size="lg"
-              block
-              onClick={this.onEditSelected}
-            >
-              Edit
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              size="lg"
-              block
-              onClick={this.onMessageSelected}
-            >
-              Message
-            </Button>
-          )}
-        </div>
+        {user ? (
+          <div className="profile-info">
+            <Image src={profileImage} roundedCircle className="my-4 mr-4" />
+            <h2>{user.fullName}</h2>
+            <p className="text-muted">Email: {user.email}</p>
+            <p className="text-muted mb-4">
+              Bio: {user.bio === "" ? "None" : user.bio}
+            </p>
+            {this.displayButton()}
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
       </div>
     );
   }
 }
 
-export default withFirebase(Profile);
+const mapStateToProps = (state, passedParams) => {
+  const { uid } = passedParams.match.params;
+  const { firebase } = state;
+  const { auth, data } = firebase;
+  const { users } = data;
+  let user;
+  if (users) user = users[uid] ? users[uid] : [];
+  return {
+    auth,
+    user,
+  };
+};
+
+export default withRouter(
+  compose(
+    connect(
+      mapStateToProps,
+      null
+    ),
+    firebaseConnect(["users"])
+  )(Profile)
+);
