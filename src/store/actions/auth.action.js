@@ -7,9 +7,13 @@ import {
   ERROR_LOGOUT,
   REQUEST_PASSWORD,
   ERROR_REQUEST_PASSWORD,
+  UPDATE_EMAIL,
+  ERROR_UPDATE_EMAIL,
+  REAUTHENTICATE,
+  ERROR_REAUTHENTICATE,
 } from "./types";
 
-import { storeProfileImage } from "./user.action";
+import { storeProfileImage, updateUserEmail } from "./user.action";
 
 export const register = (credentials, profile) => {
   return (dispatch, getState, { getFirebase }) => {
@@ -55,5 +59,43 @@ export const requestPasswordResetEmail = email => {
       .sendPasswordResetEmail(email)
       .then(() => dispatch({ type: REQUEST_PASSWORD }))
       .catch(err => dispatch({ type: ERROR_REQUEST_PASSWORD, payload: err }));
+  };
+};
+
+export const requestPasswordResetEmailProfile = () => {
+  return (dispatch, getState, { getFirebase }) => {
+    const firebase = getFirebase();
+    const user = firebase.auth().currentUser;
+    firebase
+      .auth()
+      .sendPasswordResetEmail(user.email)
+      .then(() => dispatch({ type: REQUEST_PASSWORD }))
+      .catch(err => dispatch({ type: ERROR_REQUEST_PASSWORD, payload: err }));
+  };
+};
+
+export const updateEmail = (email, password) => {
+  return (dispatch, getState, { getFirebase }) => {
+    const firebase = getFirebase();
+    const user = firebase.auth().currentUser;
+    const credentials = firebase.auth.EmailAuthProvider.credential(
+      user.email,
+      password
+    );
+    user
+      .reauthenticateAndRetrieveDataWithCredential(credentials)
+      .then(() => dispatch(updateEmailAfterReauthentication(user, email)))
+      .then(() => dispatch(updateUserEmail(user, email)))
+      .then(() => dispatch({ type: REAUTHENTICATE }))
+      .catch(err => dispatch({ type: ERROR_REAUTHENTICATE, payload: err }));
+  };
+};
+
+export const updateEmailAfterReauthentication = (user, email) => {
+  return (dispatch, getState, { getFirebase }) => {
+    user
+      .updateEmail(email)
+      .then(() => dispatch({ type: UPDATE_EMAIL }))
+      .catch(err => dispatch({ type: ERROR_UPDATE_EMAIL, payload: err }));
   };
 };

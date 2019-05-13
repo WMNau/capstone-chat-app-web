@@ -10,6 +10,7 @@ import RoomMessages from "../RoomMessages";
 import Profiles from "../Profiles";
 import Profile from "../Profile";
 import EditProfile from "../Profile/Edit.profile";
+import EditEmail from "../Profile/Edit.email.profile";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route exact path="/latest_messages" component={PrivateMessages} />
         <Route exact path="/messages/:fromUid/:toUid" component={Messages} />
 
+        <Route exact path="/user/edit/email/:uid" component={EditEmail} />
         <Route exact path="/user/edit/:uid" component={EditProfile} />
         <Route exact path="/user/:uid" component={Profile} />
         <Route exact path="/users" component={Profiles} />

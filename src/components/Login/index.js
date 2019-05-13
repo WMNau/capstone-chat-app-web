@@ -70,8 +70,8 @@ class Login extends Component {
 
   forgotPassword = e => {
     e.preventDefault();
-    // Reset errors to an empty object incase previous errors where fixed.
     this.setLoading(true);
+    // Reset errors to an empty object incase previous errors where fixed.
     this.setState({ errors: {} });
     const { email } = this.state;
     if (isEmpty(email)) {

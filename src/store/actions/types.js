@@ -2,6 +2,8 @@
 export const LOGIN = "LOGIN";
 export const LOGOUT = "LOGOUT";
 export const REQUEST_PASSWORD = "REQUEST_PASSWORD";
+export const UPDATE_EMAIL = "UPDATE_EMAIL";
+export const REAUTHENTICATE = "REAUTHENTICATE";
 
 // User
 export const CREATE_USER = "CREATE_USER";
@@ -22,6 +24,8 @@ export const ADD_CHAT = "ADD_CHAT";
 export const ERROR_LOGIN = "ERROR_LOGIN";
 export const ERROR_LOGOUT = "ERROR_LOGOUT";
 export const ERROR_REQUEST_PASSWORD = "ERROR_REQUEST_PASSWORD";
+export const ERROR_UPDATE_EMAIL = "ERROR_UPDATE_EMAIL";
+export const ERROR_REAUTHENTICATE = "ERROR_REAUTHENTICATE";
 
 // User Errors
 export const ERROR_CREATE_USER = "ERROR_CREATE_USER";

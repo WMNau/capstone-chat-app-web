@@ -111,3 +111,16 @@ export const update = (user, profile) => {
       .catch(err => dispatch({ type: ERROR_UPDATE_USER, payload: err }));
   };
 };
+
+export const updateUserEmail = (user, email) => {
+  return (dispatch, getState, { getFirebase }) => {
+    const firebase = getFirebase();
+    const updatedProfile = { email };
+    firebase
+      .database()
+      .ref(`users/${user.uid}`)
+      .update(updatedProfile)
+      .then(() => dispatch({ type: UPDATE_USER }))
+      .catch(err => dispatch({ type: ERROR_UPDATE_USER, payload: err }));
+  };
+};

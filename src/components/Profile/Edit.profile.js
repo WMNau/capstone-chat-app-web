@@ -13,9 +13,13 @@ import "./profile.scss";
 import FormField from "../common/FormField";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import Modal from "../common/Modal";
+
 import { updateProfile } from "../../store/actions/user.action";
+import { requestPasswordResetEmailProfile } from "../../store/actions/auth.action";
 
 const INITIAL_STATE = {
+  showModal: false,
   avatar: "",
   profileImage: defaultProfile,
   firstName: "",
@@ -76,6 +80,31 @@ class EditProfile extends Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
+  /**
+   * Hides the pop-up modal
+   */
+  handleClose = () => {
+    this.setState({ showModal: false });
+  };
+
+  /**
+   * Shows the pop-up modal
+   */
+  handleShow = () => {
+    this.setState({ showModal: true });
+  };
+
+  editEmail = () => {
+    const { user } = this.props;
+    if (user) this.props.history.push(`/user/edit/email/${user.uid}`);
+  };
+
+  requestPasswordReset = () => {
+    this.handleShow();
+    // Call database function to send a reset email.
+    this.props.requestPasswordResetEmailProfile();
+  };
+
   onSubmit = e => {
     e.preventDefault();
     const { avatar, firstName, lastName, bio } = this.state;
@@ -91,7 +120,14 @@ class EditProfile extends Component {
   };
 
   render() {
-    const { profileImage, firstName, lastName, bio, errors } = this.state;
+    const {
+      showModal,
+      profileImage,
+      firstName,
+      lastName,
+      bio,
+      errors,
+    } = this.state;
     return (
       <Container>
         <h1 className="my-4">Edit profile</h1>
@@ -144,6 +180,16 @@ class EditProfile extends Component {
                 onChange={this.onTextChanged}
               />
               <div className="d-flex flex-column">
+                <ButtonGroup size="lg" className="mb-4">
+                  <Button variant="warning" onClick={this.editEmail}>
+                    Edit Email
+                  </Button>
+                  <Button variant="info" onClick={this.requestPasswordReset}>
+                    Edit Password
+                  </Button>
+                </ButtonGroup>
+              </div>
+              <div className="d-flex flex-column">
                 <ButtonGroup size="lg">
                   <Button
                     variant="danger"
@@ -156,6 +202,13 @@ class EditProfile extends Component {
                   </Button>
                 </ButtonGroup>
               </div>
+
+              <Modal
+                title="PASSWORD RESET"
+                body="You should receive an email soon with instructions on how to reset your password."
+                shouldShow={showModal}
+                handleClose={this.handleClose}
+              />
             </Form>
           ) : (
             <div>Loading...</div>
@@ -182,6 +235,8 @@ const mapStateToProps = (state, passedParams) => {
 const mapDispatchToProps = dispatch => {
   return {
     updateProfile: (user, profile) => dispatch(updateProfile(user, profile)),
+    requestPasswordResetEmailProfile: () =>
+      dispatch(requestPasswordResetEmailProfile()),
   };
 };
 
