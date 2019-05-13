@@ -30,11 +30,27 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 Launches the npm run build and firebase deploy.<br>
 
-'firebase deploy' is a firebase-cli to deploy the application to firebase hosting.<br>
+```javascript
+firebase deploy
+```
 
-You must have the firebase cli installed with 'npm i -g firebase-tools'.<br>
+is a firebase-cli to deploy the application to firebase hosting.<br>
+
+You must have the firebase cli installed with
+
+```javascript
+npm i -g firebase-tools
+```
+
 Login to firebase through the cli with firebase login.<br>
-To run firebase deploy, run 'firebase init' and select 'Hosting'.<br>
+To run firebase deploy, run
+
+```javascript
+firebase init
+```
+
+and select 'Hosting'.<br>
+
 When asked which folder to deploy to, enter 'build'.<br>
 Enter 'y' when asked if this will be a single page application.
 
