@@ -20,7 +20,9 @@ const RoomMessage = ({ message, user, currentUid }) => {
           </p>
         </Col>
         <Col className="text">
-          <p>{message.text}</p>
+          <p>
+            {user.fullName}: {message.text}
+          </p>
         </Col>
       </Row>
     </ListGroup.Item>

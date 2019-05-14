@@ -12,6 +12,10 @@ export const validateEmail = ({ state, user }) => {
     errors.email = "Your new email address matches your old email address.";
   if (isEmpty(confirmEmail))
     errors.confirmEmail = `Confirm email address ${isRequired}.`;
+  if (isEmpty(errors.email) && isEmpty(errors.confirmEmail)) {
+    if (email.trim().toLowerCase() !== confirmEmail.trim().toLowerCase())
+      errors.email = "Email addresses do not match.";
+  }
   if (isEmpty(password)) errors.password = `Password ${isRequired}.`;
   return {
     isValid: isEmpty(errors),
