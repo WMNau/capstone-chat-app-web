@@ -4,6 +4,26 @@
 
 The web application for my Rose State College Capstone Project, Spring 2019.
 
+## Running locally
+
+Required programs:
+
+- Command line (i.e., Terminal for mac, Powershell for windows)
+- Node Package Manager (NPM)
+- Your favorite text editor (i.e., Visual Studio Code, Atom, Sublime, Notepad++, Brackets)
+
+### How to run locally
+
+- Open your command line
+- Change directory to where you have Capstone Chat saved to
+- Install npm
+
+* On a mac `sudo npm i -S npm`
+* On windows `npm i -S npm`
+
+- Run `npm install`
+- Start the local server `npm start`
+
 ## Available Scripts
 
 In the project directory, you can run:
